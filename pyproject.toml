@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "hand-tracking-poetry"
+version = "0.1.0"
+description = "Hand tracking using Mediapipe and ArUco markers"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+opencv-python = "^4.8.1.78"
+ur-rtde = "^1.5.7"
+pyrealsense2 = "^2.54.2.5684"
+mediapipe = "^0.10.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
