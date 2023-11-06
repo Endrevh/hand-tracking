@@ -15,11 +15,11 @@ config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 pipeline.start(config)
 
 # Connect to the UR10 CB3 robot
-robot_ip = "192.168.0.90"  # Replace with your UR10 robot IP address
+robot_ip = "192.168.0.90"  # Replace with correct UR10 robot IP address
 rtde_r = rtde_receive.RTDEReceiveInterface(robot_ip)
 
 # Directory where the images and poses will be saved
-save_directory = "extrinsic_data"
+save_directory = "calibration_data"
 os.makedirs(save_directory, exist_ok=True)
 
 # Function to save the color image from the camera
