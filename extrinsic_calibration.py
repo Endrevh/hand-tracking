@@ -2,7 +2,6 @@ import cv2
 import pyrealsense2 as rs
 import numpy as np
 import rtde_receive
-import time
 import os
 
 # Connect to the camera
@@ -33,13 +32,13 @@ def save_color_image(frame, iteration):
 def save_tcp_pose(pose):
     file_name = os.path.join(save_directory, f"extrinsic_calibration_poses.txt")
     with open(file_name, 'a') as file:
-        file.write(str(pose))
+        file.write(str(pose)+"\n")
     print(f"TCP pose saved")
 
 # Main loop
 for i in range(20):
-    # Wait for spacebar press
-    input("Press Spacebar to capture (in the console) and then press Enter.")
+    # Wait for Enter press
+    input(f"Press Enter to capture. Number of images captured: {i}")
     
     # Capture frame-by-frame
     frames = pipeline.wait_for_frames()
