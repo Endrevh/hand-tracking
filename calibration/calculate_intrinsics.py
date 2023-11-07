@@ -3,7 +3,7 @@ import cv2
 import glob
 
 # Define the chessboard size and squares' size
-#chessboard_size = (18, 29)
+chessboard_size = (18, 29)
 square_size = 0.01  # 10mm in meters
 
 # Arrays to store object points and image points from all the images
@@ -12,8 +12,8 @@ imgpoints = []  # 2d points in image plane
 image_shape = None  # We'll set this after reading the first image
 
 # Prepare object points, like (0,0,0), (1,0,0), (2,0,0), ....,(6,5,0)
-objp = np.zeros((28 * 17, 3), np.float32)
-objp[:, :2] = np.mgrid[0:17, 0:28].T.reshape(-1, 2)
+objp = np.zeros(((chessboard_size[1]-1) * (chessboard_size[0]-1), 3), np.float32)
+objp[:, :2] = np.mgrid[0:(chessboard_size[0]-1), 0:(chessboard_size[1]-1)].T.reshape(-1, 2)
 objp *= square_size
 
 # Termination criteria for the iterative algorithm
@@ -33,7 +33,7 @@ for idx, fname in enumerate(images):
     if image_shape is None:
         image_shape = gray.shape[::-1]
 
-    ret, corners = cv2.findChessboardCorners(gray, (17, 28), None)
+    ret, corners = cv2.findChessboardCorners(gray, (chessboard_size[0]-1, chessboard_size[1]-1), None)
     
     # If found, add object points, image points
     if ret:
