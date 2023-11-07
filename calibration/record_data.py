@@ -24,7 +24,7 @@ os.makedirs(save_directory, exist_ok=True)
 
 # Function to save the color image from the camera
 def save_color_image(frame, iteration):
-    img_name = os.path.join(save_directory, f"image_{iteration}.png")
+    img_name = os.path.join(save_directory, f"image_{iteration:02}.png")
     cv2.imwrite(img_name, frame)
     print(f"Image saved: {img_name}")
 
