@@ -19,7 +19,7 @@ robot_ip = "192.168.0.90"  # Replace with correct UR10 robot IP address
 rtde_r = rtde_receive.RTDEReceiveInterface(robot_ip)
 
 # Directory where the images and poses will be saved
-save_directory = "calibration_data"
+save_directory = "calibration_data2"
 os.makedirs(save_directory, exist_ok=True)
 
 # Function to save the color image from the camera
