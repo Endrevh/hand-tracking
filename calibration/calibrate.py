@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import glob
+import matplotlib.pyplot as plt
 
 # Specify the dimensions of the chessboard
 chessboard_size = (18, 29)
@@ -52,9 +53,9 @@ for idx, fname in enumerate(images):
         imgpoints.append(corners2)
 
         # Draw and display the corners
-        #img = cv2.drawChessboardCorners(img, (chessboard_size[0]-1, chessboard_size[1]-1), corners2, ret)
-        #cv2.imshow('img', img)
-        #cv2.waitKey(500)
+        img = cv2.drawChessboardCorners(img, (chessboard_size[0]-1, chessboard_size[1]-1), corners2, ret)
+        cv2.imshow('img', img)
+        cv2.waitKey(5000)
 
 cv2.destroyAllWindows()
 
@@ -97,3 +98,37 @@ else:
 
 # Save the transformation matrix to file
 np.savetxt('hand_eye_transformation.txt', hand_eye_transformation_matrix)
+
+# Calculate re-projection error
+error_accumulated = 0
+errors = []
+for i in range(len(objpoints)):
+    imgpoints_reprojected, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
+    error = cv2.norm(imgpoints[i], imgpoints_reprojected, cv2.NORM_L2)/len(imgpoints_reprojected)
+    error_accumulated += error
+    errors.append(error)
+
+# Calculate mean error
+mean_error = error_accumulated/len(objpoints)
+print( "total error: {}".format(mean_error))
+
+# Calculate standard deviation
+std_dev = np.std(errors)
+k = 2 # Number of standard deviations away from mean considered as outliers
+print("Standard deviation: {}".format(std_dev))
+
+# Scatter plot of re-projection errors
+plt.figure(figsize=(10, 6))
+# Generate a list of indices to use as the x-axis for the scatter plot
+indices = list(i for i in range(1, len(errors) + 1))
+plt.scatter(indices, errors)
+plt.title('Scatter plot of re-projection errors over all corners')
+plt.xlabel('Image number')
+plt.ylabel('Re-projection error [pixels]')
+plt.axhline(y=mean_error, color='b', linestyle='--')
+plt.axhline(y=mean_error + k*std_dev, color='r', linestyle='--')
+plt.axhline(y=mean_error - k*std_dev, color='r', linestyle='--')
+# Add legend for the mean and standard deviation lines
+plt.legend(['Single image error', 'Mean error', 'Mean ± 3*std'])
+plt.xticks(indices)
+plt.show()
