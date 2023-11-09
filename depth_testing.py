@@ -21,6 +21,15 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.7)
 
+# Get camera matrix and distortion coefficients from file
+camera_matrix_file = 'calibration/camera_matrix.txt'
+dist_coeff_file = 'calibration/dist_coefficients.txt'
+
+camera_matrix = np.loadtxt(camera_matrix_file, delimiter=' ')
+dist_coeffs = np.loadtxt(dist_coeff_file, delimiter=' ')
+print(camera_matrix)
+print(dist_coeffs)
+
 try:
     while True:
         # Wait for frames from the RealSense device
@@ -32,10 +41,13 @@ try:
         color_frame = aligned_frames.get_color_frame()
         if not aligned_depth_frame or not color_frame:
             continue
+        
+        # Apply camera matrix and distortion coefficients
+        color_frame_undistorted = cv2.undistort(color_image, camera_matrix, dist_coeffs)
 
         # Convert images to numpy arrays
         aligned_depth_image = np.asanyarray(aligned_depth_frame.get_data())
-        color_image = np.asanyarray(color_frame.get_data())
+        color_image = np.asanyarray(color_frame_undistorted.get_data())
 
         # Process the color image with MediaPipe
         results = hands.process(cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB))
@@ -55,6 +67,11 @@ try:
 
                 print(f"x_wrist: {x_wrist}, y_wrist: {y_wrist}")
                 z_wrist = aligned_depth_frame.get_distance(x_wrist,y_wrist)
+
+                # Convert from pixel to camera coordinates
+                x_camera = (landmark.x - camera_matrix[0,2]) * z_wrist / camera_matrix[0,0]
+                y_camera = (landmark.y - camera_matrix[1,2]) * z_wrist / camera_matrix[1,1]
+                z_camera = z_wrist
 
                 #print("Depth to base of middle finger: ", z)
                 print("Depth to wrist: ", z_wrist)
