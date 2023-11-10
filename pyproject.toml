@@ -11,6 +11,7 @@ opencv-python = "^4.8.1.78"
 ur-rtde = "^1.5.7"
 pyrealsense2 = "^2.54.2.5684"
 mediapipe = "^0.10.7"
+opencv-contrib-python = "^4.8.1.78"
 
 
 [build-system]

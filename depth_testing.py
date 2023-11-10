@@ -67,14 +67,26 @@ try:
 
                 print(f"x_wrist: {x_wrist}, y_wrist: {y_wrist}")
                 z_wrist = aligned_depth_frame.get_distance(x_wrist,y_wrist)
+                print("Depth to wrist: ", z_wrist)
 
                 # Convert from pixel to camera coordinates
-                x_camera = (landmark.x - camera_matrix[0,2]) * z_wrist / camera_matrix[0,0]
-                y_camera = (landmark.y - camera_matrix[1,2]) * z_wrist / camera_matrix[1,1]
-                z_camera = z_wrist
+                landmarks_camera_coordinates = []
+                for landmark in hand_landmarks.landmark:
+                    
+                    x_pixel, y_pixel = int(landmark.x * color_image.shape[1]), int(landmark.y * color_image.shape[0])
+
+                    # Sanity check 
+                    x_pixel = np.clip(x_wrist, 0, aligned_depth_image.shape[1] - 1)
+                    y_pixel = np.clip(y_wrist, 0, aligned_depth_image.shape[0] - 1)
+
+                    z_camera = aligned_depth_frame.get_distance(x_pixel, y_pixel)
+
+                    x_camera = (x_pixel - camera_matrix[0,2]) * z_camera / camera_matrix[0,0]
+                    y_camera = (y_pixel - camera_matrix[1,2]) * z_camera / camera_matrix[1,1]
+
+                    landmarks_camera_coordinates.append([x_camera, y_camera, z_camera])
 
                 #print("Depth to base of middle finger: ", z)
-                print("Depth to wrist: ", z_wrist)
                 #    #depth = depth_frame.get_distance(x, y)
                 #    #print(f"Landmark at (x={x}, y={y}), Depth: {depth} meters")
                 
