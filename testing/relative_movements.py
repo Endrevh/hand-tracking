@@ -108,7 +108,7 @@ def track_hand(color_image, depth_frame, camera_matrix, dist_coefficients):
 
 # Main function
 def main():
-    calibration_folder = "calibration"
+    calibration_folder = "../calibration"
     camera_matrix, dist_coefficients, hand_eye_transformation = load_calibration_data(calibration_folder)
     
     pipeline = initialize_camera()
@@ -132,7 +132,7 @@ def main():
     marker_length = 0.028
 
     # Open file where data will be saved
-    data_file = open('data/relative_movements_translation_small_with_images_closer.txt', 'w')
+    data_file = open('../data/relative_movements_translation_small_with_images_closer.txt', 'w')
 
     # Start robot movement
     velocity = 0.2
@@ -187,7 +187,7 @@ def main():
             print("Etter aruco track")
 
             if first is True:
-                img_name = os.path.join("data", f"image_start_translation_small_closer.png")
+                img_name = os.path.join("../data", f"image_start_translation_small_closer.png")
                 cv2.imwrite(img_name, color_image)
                 first = False
             # Or for hand tracking:
@@ -219,7 +219,7 @@ def main():
         color_frame = aligned_frames.get_color_frame()
         color_image = np.asanyarray(color_frame.get_data())
 
-        img_name = os.path.join("data", f"image_end_translation_small_closer.png")
+        img_name = os.path.join("../data", f"image_end_translation_small_closer.png")
         cv2.imwrite(img_name, color_image)
         
         pipeline.stop()

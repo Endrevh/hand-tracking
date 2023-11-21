@@ -11,7 +11,7 @@ hands = mp_hands.Hands(static_image_mode=True,
                        min_detection_confidence=0.4)
 
 # Load image.
-image_path = 'images/CR7.jpg'  # Update with your image path.
+image_path = '../images/CR7.jpg'  # Update with your image path.
 image = cv2.imread(image_path)
 if image is None:
     raise ValueError("Image not found")

@@ -24,11 +24,11 @@ mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.7)
 
 # Get camera matrix and distortion coefficients from file
-camera_matrix_file = 'calibration/camera_matrix.txt'
-dist_coeff_file = 'calibration/dist_coefficients.txt'
+camera_matrix_file = '../calibration/camera_matrix.txt'
+dist_coeff_file = '../calibration/dist_coefficients.txt'
 
 # Open file where data will be recorded    
-data_file = open('data/trash.txt', 'w')
+data_file = open('../data/trash.txt', 'w')
 
 # Load intrinsic parameters from file
 camera_matrix = np.loadtxt(camera_matrix_file, delimiter=' ')
@@ -102,7 +102,7 @@ try:
                 # Save first image to file
                 if first is True:
                     mp_drawing.draw_landmarks(color_image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-                    img_name = os.path.join("data", f"noise_test_image_3.png")
+                    img_name = os.path.join("../data", f"noise_test_image_3.png")
                     cv2.imwrite(img_name, color_image)
                     first = False
 
