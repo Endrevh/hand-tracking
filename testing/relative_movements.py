@@ -91,21 +91,60 @@ def track_aruco(color_image, camera_matrix, dist_coefficients, aruco_dictionary,
         return None, None
 
 # Tracking function for human hand using MediaPipe
-def track_hand(color_image, depth_frame, camera_matrix, dist_coefficients):
-    # TODO: Initialize MediaPipe hand tracking
-    # For example:
-    # mp_hands = mp.solutions.hands
-    # hands = mp_hands.Hands()
+def track_hand(color_image_rgb, depth_frame, camera_matrix, dist_coefficients):
+    # Setup MediaPipe
+    mp_hands = mp.solutions.hands
+    mp_drawing = mp.solutions.drawing_utils
+    hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.01)
     
-    # TODO: Perform hand tracking using MediaPipe on the color_image
-    # TODO: Get the hand keypoint coordinates
-    # TODO: Estimate depth using the depth_frame at the keypoint coordinates
-    
-    # Return the hand position (x, y, z) in the camera frame
-    # Replace with actual hand tracking logic
-    # return np.array([x, y, z])
-    return None
+    # Process the color image with MediaPipe
+    results = hands.process(color_image_rgb)
 
+    landmarks_camera_coordinates = []
+    if results.multi_hand_landmarks:
+        # Convert from pixel to camera coordinates for all landmarks
+        landmarks = results.multi_hand_landmarks[0]
+        for landmark in landmarks.landmark:
+            
+            x_pixel, y_pixel = int(landmark.x * color_image_rgb.shape[1]), int(landmark.y * color_image_rgb.shape[0])
+
+            # Sanity check 
+            x_pixel = np.clip(x_pixel, 0, color_image_rgb.shape[1] - 1)
+            y_pixel = np.clip(y_pixel, 0, color_image_rgb.shape[0] - 1)
+
+            z_camera = depth_frame.get_distance(x_pixel, y_pixel)
+            
+            # Get x,y in camera coordinates using estimated depth and camera parameters
+            x_camera = (x_pixel - camera_matrix[0,2]) * z_camera / camera_matrix[0,0]
+            y_camera = (y_pixel - camera_matrix[1,2]) * z_camera / camera_matrix[1,1]
+
+            landmarks_camera_coordinates.append([x_camera, y_camera, z_camera])
+
+        # Draw landmarks on image
+        mp_drawing.draw_landmarks(color_image_rgb, landmarks, mp_hands.HAND_CONNECTIONS)
+
+        # Calculate averages
+        #total_x = total_y = total_z = 0
+
+        #elements_added = 0
+        #for landmark in landmarks_camera_coordinates:
+            #if 0.0 in landmark:
+            #    continue
+            #total_x += landmark[0]
+            #total_y += landmark[1]
+            #total_z += landmark[2]
+            #elements_added += 1
+
+        #average_x = total_x / elements_added
+        #average_y = total_y / elements_added
+        #average_z = total_z / elements_added
+        #return np.array([average_x, average_y, average_z]), color_image
+        print("detected")
+        return np.array([landmarks_camera_coordinates[0][0], landmarks_camera_coordinates[0][1], landmarks_camera_coordinates[0][2]]), color_image_rgb
+    else:
+        print("Not detected")
+        return None, None
+    
 # Main function
 def main():
     calibration_folder = "../calibration"
@@ -114,7 +153,7 @@ def main():
     pipeline = initialize_camera()
 
     robot_ip_address = "192.168.0.90"
-    initial_robot_pose = [0.214, 0.298, 0.829, 0.0179, -0.0120, -5.4805] #used in translation-test
+    initial_robot_pose = [0.190, 0.227, 0.723, 0.314, 0.1771, 5.4785] #used in translation-test
     #initial_robot_pose = [0.649, 0.547, 1.066, 0.0071, 0.8116, 1.1933] #used in rotation test
     rtde_c, rtde_r = initialize_robot(robot_ip_address, initial_robot_pose)
     print("Finished initializing robot")
@@ -131,17 +170,14 @@ def main():
     aruco_dictionary = cv2.aruco.DICT_6X6_100
     marker_length = 0.028
 
-    # Open file where data will be saved
-    data_file = open('../data/relative_movements_translation_small_with_images_closer.txt', 'w')
-
     # Start robot movement
     velocity = 0.2
     acceleration = 0.2
     blend = 0.01
     # Used in translation-test:
-    pose_1 = [0.414, 0.298, 0.829, 0.0179, -0.0120, -5.4805, velocity, acceleration, blend]
-    pose_2 = [0.414, 0.498, 0.829, 0.0179, -0.0120, -5.4805, velocity, acceleration, blend]
-    pose_3 = [0.414, 0.498, 1.029, 0.0179, -0.0120, -5.4805, velocity, acceleration, 0]
+    pose_1 = [0.390, 0.227, 0.723, 0.314, 0.1771, 5.4785, velocity, acceleration, blend]
+    pose_2 = [0.390, 0.427, 0.723, 0.314, 0.1771, 5.4785, velocity, acceleration, blend]
+    pose_3 = [0.390, 0.427, 0.623, 0.314, 0.1771, 5.4785, velocity, acceleration, 0]
     path = [pose_1, pose_2, pose_3]
 
     #pose_1 = [0.360, 0.507, 0.994, 0.5417, -0.3235, -5.4589, velocity, acceleration, blend]
@@ -157,12 +193,15 @@ def main():
     
     print("Etter sleep")
 
+    glove_color = "transparent"
 
     tcp_speed = rtde_r.getActualTCPSpeed()
     tcp_speed_norm = np.linalg.norm(np.array(tcp_speed))
 
-    first = True
+    data_recorded = []
 
+    first = True
+    
     try:
         while tcp_speed_norm > 0.001:  # Robot movement condition
             frames = pipeline.wait_for_frames()
@@ -174,24 +213,37 @@ def main():
             if not depth_frame or not color_frame:
                 continue
             
-            print("Iteration")
-            # Convert images to numpy arrays
-            depth_image = np.asanyarray(depth_frame.get_data())
+            #print("Iteration")
+            # Convert image to numpy array
             color_image = np.asanyarray(color_frame.get_data())
             
             # Perform tracking
-            tvec, rvec = track_aruco(color_image, camera_matrix, dist_coefficients, aruco_dictionary, marker_length)
-            if tvec is None or rvec is None:
-                data_file.write("MISSING\n")
-                continue
-            print("Etter aruco track")
+            color_image_rgb = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+            #tvec, rvec = track_aruco(color_image, camera_matrix, dist_coefficients, aruco_dictionary, marker_length)
+            #if tvec is None or rvec is None:
+                #data_file.write("MISSING\n")
+                #continue
 
+            tvec, annotated_image = track_hand(color_image_rgb, depth_frame, camera_matrix, dist_coefficients)
+            
+            
             if first is True:
-                img_name = os.path.join("../data", f"image_start_translation_small_closer.png")
-                cv2.imwrite(img_name, color_image)
+                img_name = os.path.join("../data", f"image_start_translation_glove_{glove_color}.png")
+                if annotated_image is not None:
+                    cv2.imwrite(img_name, cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+                else:
+                    cv2.imwrite(img_name, color_image)
+                
                 first = False
-            # Or for hand tracking:
-            # object_position = track_hand(color_image, depth_image, camera_matrix, dist_coefficients)
+                
+            if tvec is None:
+                data_recorded.append("MISSING\n")
+                continue
+            
+                
+            #print("Etter tracking")
+
+            
             
             # Get robot pose and speed
             tcp_pose = rtde_r.getActualTCPPose()
@@ -206,22 +258,35 @@ def main():
             f"{tcp_pose[3]},{tcp_pose[4]},{tcp_pose[5]},"
             f"{tcp_speed[0]},{tcp_speed[1]},{tcp_speed[2]},"
             f"{tcp_speed[3]},{tcp_speed[4]},{tcp_speed[5]},"
-            f"{tvec[0]},{tvec[1]},{tvec[2]},"
-            f"{rvec[0]},{rvec[1]},{rvec[2]}\n")
-        
-            data_file.write(line)
+            f"{tvec[0]},{tvec[1]},{tvec[2]}\n")
+            #f"{rvec[0]},{rvec[1]},{rvec[2]}\n")
+
+            data_recorded.append(line)
 
             #time.sleep(0.1)  # Add appropriate delay if necessary
     finally:
+
+        # Open file where data will be saved
+        data_file = open(f'../data/relative_movements_translation_glove_{glove_color}.txt', 'w')
+        for line in data_recorded:
+            data_file.write(line)
+
         frames = pipeline.wait_for_frames()
         aligned_frames = align.process(frames)
         depth_frame = aligned_frames.get_depth_frame()
         color_frame = aligned_frames.get_color_frame()
         color_image = np.asanyarray(color_frame.get_data())
 
-        img_name = os.path.join("../data", f"image_end_translation_small_closer.png")
-        cv2.imwrite(img_name, color_image)
+        tvec, annotated_image = track_hand(color_image, depth_frame, camera_matrix, dist_coefficients)
+
+        img_name = os.path.join("../data", f"image_end_translation_glove_{glove_color}.png")
+        if annotated_image is not None:
+            cv2.imwrite(img_name, cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+        else:
+            cv2.imwrite(img_name, color_image)
+        cv2.imshow("Title", color_image)
         
+
         pipeline.stop()
         # Clean up and close any other necessary connections
         rtde_c.disconnect()
