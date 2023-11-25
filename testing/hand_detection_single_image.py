@@ -8,7 +8,7 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(static_image_mode=True,
                        max_num_hands=2,
-                       min_detection_confidence=0.001)
+                       min_detection_confidence=0.2)
 
 for i in range(1, 61):
     # Load image.

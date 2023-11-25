@@ -21,26 +21,33 @@ def read_and_filter_data(file_path):
                     continue
     return np.array(valid_data)
 
-# Specify the path to your data file
-data_file = '../data/relative_movements_translation_aruco_small_closer.txt'
+# Specify the path to the data file
+data_file_1 = '../data/relative_movements_translation_aruco_small.txt'
+data_file_2 = '../data/relative_movements_translation_aruco_big.txt'
 
 # Call the read and filter data function
-data = read_and_filter_data(data_file)
+data_1 = read_and_filter_data(data_file_1)
+data_2 = read_and_filter_data(data_file_2)
 
-# Continue with your analysis only if data is not empty
-if data.size > 0:
+
+# Continue with analysis only if data is not empty
+if data_1.size > 0:
     # Extract timestamps, robot poses, and estimated object positions
-    timestamps = data[:, 0] - data[0, 0]  # Adjust timestamps to start from zero
-    robot_poses = data[:, 1:4]
-    object_positions = data[:, 13:16]
+    timestamps_1 = data_1[:, 0] - data_1[0, 0]  # Adjust timestamps to start from zero
+    timestamps_2 = data_2[:, 0] - data_2[0, 0]
+    robot_poses = data_1[:, 1:4]
+    object_positions_1 = data_1[:, 13:16]
+    object_positions_2 = data_2[:, 13:16]
 
     # Compute Euclidean distances
     robot_distances = np.linalg.norm(robot_poses - robot_poses[0], axis=1)
-    object_distances = np.linalg.norm(object_positions - object_positions[0], axis=1)
+    object_distances_1 = np.linalg.norm(object_positions_1 - object_positions_1[0], axis=1)
+    object_distances_2 = np.linalg.norm(object_positions_2 - object_positions_2[0], axis=1)
 
     # Plot trajectories against time
-    plt.plot(timestamps, robot_distances, label='Robot distance moved')
-    plt.plot(timestamps, object_distances, label='Object estimated distance moved')
+    plt.plot(timestamps_1, robot_distances, label='Distance moved, end-effector')
+    plt.plot(timestamps_1, object_distances_1, label='Estimated distance moved, small ArUco marker')
+    plt.plot(timestamps_2, object_distances_2, label='Estimated distance moved, large ArUco marker')
     plt.xlabel('Time (seconds)')
     plt.ylabel('Euclidean Distance')
     plt.legend()
