@@ -31,9 +31,9 @@ def calculate_standard_deviation(values):
 
 def plot_data(times, z1_values, avg_z_values, avg_z_values_no_tips):
     times_seconds = [t/1000.0 for t in times]
-    plt.plot(times_seconds, z1_values, label='Depth of wrist')
-    plt.plot(times_seconds, avg_z_values, label='Average depth of all landmarks')
-    plt.plot(times_seconds, avg_z_values_no_tips, label='Average depth of all landmarks excluding tips')
+    plt.plot(times_seconds, z1_values, label='Wrist landmark')
+    plt.plot(times_seconds, avg_z_values, label='Average of all landmarks')
+    plt.plot(times_seconds, avg_z_values_no_tips, label='Average of all landmarks excluding tips')
     plt.xlabel('Time [s]')
     plt.ylabel('Depth estimate [m]')
     #plt.title('Hand depth estimate, wrist vs. average of all landmarks')
