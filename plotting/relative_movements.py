@@ -43,6 +43,11 @@ data_2 = read_and_filter_data(data_file_2)
 data_1_total, data_1_occurrences = count_occurrences_in_file(data_file_1, "MISSING")
 data_2_total, data_2_occurrences = count_occurrences_in_file(data_file_2, "MISSING")
 
+print(f"Total number of lines in data 1: {data_1_total}")
+print(f"Total number of lines in data 2: {data_2_total}")
+print(f"Number of lines with 'MISSING' in data 1: {data_1_occurrences}")
+print(f"Number of lines with 'MISSING' in data 2: {data_2_occurrences}")
+
 data_1_success_rate = 1 - float(data_1_occurrences / data_1_total)
 data_2_success_rate = 1 - float(data_2_occurrences / data_2_total)
 print(f"Detection success rate in data 1: {data_1_success_rate}")
