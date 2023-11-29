@@ -70,6 +70,7 @@ if data_1.size > 0:
     plt.ylabel('Euclidean distance [m]')
     plt.title('Estimated distance moved by marker vs. end-effector')
     plt.legend()
+    plt.grid()
     plt.show()
 else:
     print("No valid data to plot.")

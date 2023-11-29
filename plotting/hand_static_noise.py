@@ -39,6 +39,7 @@ def plot_data(times, z1_values, avg_z_values, avg_z_values_no_tips):
     #plt.title('Hand depth estimate, wrist vs. average of all landmarks')
     plt.title('Hand depth estimate, wrist vs. average of landmarks')
     plt.legend()
+    plt.grid()
     plt.show()
 
 # Main script
