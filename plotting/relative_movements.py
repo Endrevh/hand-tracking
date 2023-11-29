@@ -21,6 +21,16 @@ def read_and_filter_data(file_path):
                     continue
     return np.array(valid_data)
 
+def count_occurrences_in_file(file_path, word):
+    total_lines = 0
+    number_of_occurrences = 0
+    with open(file_path, 'r') as file:
+        for line in file:
+            total_lines += 1
+            if word in line:
+                number_of_occurrences += 1
+    return total_lines, number_of_occurrences            
+
 # Specify the path to the data file
 data_file_1 = '../data/relative_movements_translation_aruco_small.txt'
 data_file_2 = '../data/relative_movements_translation_aruco_big.txt'
@@ -29,6 +39,14 @@ data_file_2 = '../data/relative_movements_translation_aruco_big.txt'
 data_1 = read_and_filter_data(data_file_1)
 data_2 = read_and_filter_data(data_file_2)
 
+# Count occurrences of "MISSING" in data files and print detection success rate
+data_1_total, data_1_occurrences = count_occurrences_in_file(data_file_1, "MISSING")
+data_2_total, data_2_occurrences = count_occurrences_in_file(data_file_2, "MISSING")
+
+data_1_success_rate = 1 - float(data_1_occurrences / data_1_total)
+data_2_success_rate = 1 - float(data_2_occurrences / data_2_total)
+print(f"Detection success rate in data 1: {data_1_success_rate}")
+print(f"Detection success rate in data 2: {data_2_success_rate}")
 
 # Continue with analysis only if data is not empty
 if data_1.size > 0:
@@ -45,11 +63,12 @@ if data_1.size > 0:
     object_distances_2 = np.linalg.norm(object_positions_2 - object_positions_2[0], axis=1)
 
     # Plot trajectories against time
-    plt.plot(timestamps_1, robot_distances, label='Distance moved, end-effector')
-    plt.plot(timestamps_1, object_distances_1, label='Estimated distance moved, small ArUco marker')
-    plt.plot(timestamps_2, object_distances_2, label='Estimated distance moved, large ArUco marker')
-    plt.xlabel('Time (seconds)')
-    plt.ylabel('Euclidean Distance')
+    plt.plot(timestamps_1, robot_distances, label='End-effector')
+    plt.plot(timestamps_1, object_distances_1, label='Small ArUco marker')
+    plt.plot(timestamps_2, object_distances_2, label='Large ArUco marker')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Euclidean distance [m]')
+    plt.title('Estimated distance moved by marker vs. end-effector')
     plt.legend()
     plt.show()
 else:
