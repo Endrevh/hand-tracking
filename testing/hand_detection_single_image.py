@@ -8,11 +8,11 @@ mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(static_image_mode=True,
                        max_num_hands=2,
-                       min_detection_confidence=0.2)
+                       min_detection_confidence=0.05)
 
 for i in range(1, 61):
     # Load image.
-    image_path = f'../data/workspace_images/{i:02}.png'  # Update with your image path.
+    image_path = f'../data/workspace_images/{i:02}.png'  # Update with image path.
     image = cv2.imread(image_path)
     if image is None:
         raise ValueError("Image not found")
@@ -26,9 +26,7 @@ for i in range(1, 61):
     if not results.multi_hand_landmarks:
         print("Hand not detected")
 
-        
     else:
-
         print("Number of hands detected:", len(results.multi_hand_landmarks))
 
         # Draw hand landmarks.
@@ -44,9 +42,8 @@ for i in range(1, 61):
                 # Draw landmarks and connections.
                 mp_drawing.draw_landmarks(image_rgb, hand_landmarks, mp_hands.HAND_CONNECTIONS)
                 
-
     # Show image.
-    cv2.imshow('Hand Tracking', cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR))
+    cv2.imshow(f'Hand detection, image {i}', cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR))
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
