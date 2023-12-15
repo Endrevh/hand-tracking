@@ -32,7 +32,7 @@ def count_occurrences_in_file(file_path, word):
     return total_lines, number_of_occurrences            
 
 # Specify the path to the data file
-data_file_1 = '../data/relative_movements_translation_aruco_small.txt'
+data_file_1 = '../data/relative_movements_translation_hand.txt'
 data_file_2 = '../data/relative_movements_translation_aruco_big.txt'
 
 # Call the read and filter data function
@@ -69,11 +69,11 @@ if data_1.size > 0:
 
     # Plot trajectories against time
     plt.plot(timestamps_1, robot_distances, label='End-effector')
-    plt.plot(timestamps_1, object_distances_1, label='Small ArUco marker')
-    plt.plot(timestamps_2, object_distances_2, label='Large ArUco marker')
+    plt.plot(timestamps_1, object_distances_1, label='Hand')
+    #plt.plot(timestamps_2, object_distances_2, label='Large ArUco marker')
     plt.xlabel('Time [s]')
     plt.ylabel('Euclidean distance [m]')
-    plt.title('Estimated distance moved by marker vs. end-effector')
+    #plt.title('Estimated distance moved by marker vs. end-effector')
     plt.legend()
     plt.grid()
     plt.show()

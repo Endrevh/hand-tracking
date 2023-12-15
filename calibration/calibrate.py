@@ -122,7 +122,7 @@ plt.figure(figsize=(10, 6))
 # Generate a list of indices to use as the x-axis for the scatter plot
 indices = list(i for i in range(1, len(errors) + 1))
 plt.scatter(indices, errors)
-plt.title('Scatter plot of re-projection errors over all corners')
+#plt.title('Scatter plot of re-projection errors over all corners')
 plt.xlabel('Image number')
 plt.ylabel('Re-projection error [pixels]')
 plt.axhline(y=mean_error, color='b', linestyle='--')
