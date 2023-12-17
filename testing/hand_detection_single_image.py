@@ -12,7 +12,7 @@ hands = mp_hands.Hands(static_image_mode=True,
 
 for i in range(1, 61):
     # Load image.
-    image_path = f'../data/workspace_images/{i:02}.png'  # Update with image path.
+    image_path = f'../data/workspace_images/{i:02}.png'
     image = cv2.imread(image_path)
     if image is None:
         raise ValueError("Image not found")

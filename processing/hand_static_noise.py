@@ -43,7 +43,7 @@ def plot_data(times, z1_values, avg_z_values, avg_z_values_no_tips):
     plt.show()
 
 # Main script
-filename = '../data/static_noise_test.txt'  # Replace with your file name
+filename = '../data/static_noise_test.txt'
 times, z1_values, avg_z_values, avg_z_values_no_tips  = read_data(filename)
 
 std_dev_z1 = calculate_standard_deviation(z1_values)

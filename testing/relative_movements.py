@@ -83,8 +83,6 @@ def track_aruco(color_image, camera_matrix, dist_coefficients, aruco_dictionary,
     if ids is not None:
         # TODO: Choose how to handle multiple markers
         rvec, tvec, trash = my_estimatePoseSingleMarker(corners[0], marker_length, camera_matrix, dist_coefficients)
-        #print(rvec)
-        # TODO: Convert tvec to the desired coordinate frame if necessary
         return tvec.flatten(), rvec
     else:
         # No marker detected
@@ -186,13 +184,9 @@ def main():
     
     rtde_c.moveL(path, True)
 
-    print("Før sleep")
-
     # Let robot start moving before evaluating robot movement condition
     time.sleep(0.1)
     
-    print("Etter sleep")
-
     glove_color = "transparent"
 
     tcp_speed = rtde_r.getActualTCPSpeed()
@@ -213,7 +207,6 @@ def main():
             if not depth_frame or not color_frame:
                 continue
             
-            #print("Iteration")
             # Convert image to numpy array
             color_image = np.asanyarray(color_frame.get_data())
             
@@ -238,12 +231,7 @@ def main():
                 
             if tvec is None:
                 data_recorded.append("MISSING\n")
-                continue
-            
-                
-            #print("Etter tracking")
-
-            
+                continue            
             
             # Get robot pose and speed
             tcp_pose = rtde_r.getActualTCPPose()
