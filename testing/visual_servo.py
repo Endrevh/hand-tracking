@@ -227,14 +227,10 @@ def main():
 
     while running_flag:
         counter += 1
-        #if controller_ready_event.wait(0):
-            #controller_ready_event.clear()
-            #print("Main Thread: Controller Ready is True")
             
         frames = pipeline.wait_for_frames()
         print("-------------------------------")
         # Save timestamp
-        #print(f"Diff: {datetime.now().timestamp() - timestamp}")
         timestamp = datetime.now().timestamp()
 
         aligned_frames = align.process(frames)
@@ -316,15 +312,6 @@ def main():
                 servotime = dt - elapsed
 
                 servoL(rtde_c, pose_desired, flange_pose, servotime, lookahead_time, scaling_factor)
-                #control_queue.put((rtde_c, pose_desired, flange_pose, servotime, lookahead_time, scaling_factor))
-                #print(f"Desired pose: {pose_desired}")
-                #print(f"Current pose: {flange_pose}")
-                #print(f"Hand pose: {hand_coordinates_base}")
-
-                #print(f"Setpoint: {tracking_offset_setpoint}")
-                #print(f"dt {dt}")
-                #print(f"elapsed {elapsed}")
-                #print(f"servotime {servotime}")
 
         else:
             #print("Not detected")
@@ -343,11 +330,6 @@ def main():
         for line in data_recorded:
             file.write(line)
 
-    # Wait for threads to finish
-    #scheduler_thread.join()
-
-
-    # Remember to double check correct use of RGB and BGR in OpenCV
 
 # Entry point of the script
 if __name__ == "__main__":
