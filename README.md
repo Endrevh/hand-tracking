@@ -1,6 +1,6 @@
 # hand-tracking
 
-This repository contains scripts used in the master's thesis "Machine-learning techniques for human-robot collaboration in manufacturing" at NTNU, submitted by Endre Vee Hagestuen in June 2024.
+This repository contains scripts and data used in the master's thesis "Machine-learning techniques for human-robot collaboration in manufacturing" at NTNU, submitted by Endre Vee Hagestuen in June 2024.
 
 **Repository Structure**
 - calibration: Contains scripts and data for intrinsic and extrinsic camera calibration.
